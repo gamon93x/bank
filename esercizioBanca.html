@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<script type="text/javascript">
+			
+			class Account{
+
+				constructor(titolare, saldo){
+					this.titolare = titolare;
+					this.saldo = saldo;
+					this.cronologia = [];
+				}
+
+				deposito(soldi){
+					 this.saldo += soldi;
+					 this.cronologia.push({
+					 	tipo : 'deposito',
+					 	importo : soldi ,
+					 	data : new Date().toISOString().split('T')[0]
+					 });
+					 return this.saldo;
+				}
+
+				prelievo(soldi){
+					 this.saldo -= soldi;
+					 this.cronologia.push({
+					 	tipo : 'prelievo',
+					 	importo : soldi ,
+					 	data : new Date().toISOString().split('T')[0]
+
+					 });
+					  return this.saldo;
+				}
+
+				getSaldo(){
+					return this.saldo;
+				}
+
+				stampaEstrattoConto(){
+					console.log(this.cronologia);
+				}
+
+			}
+
+
+			class ContoCorrente extends Account {
+				constructor(titolare, saldo, limite){
+					super(titolare,saldo);
+					this.limite = limite;
+				}
+
+				prelievo(soldi, dataPrelievo){
+					var adesso = new Date().toISOString().split('T')[0];
+
+					if(this.calcolaPrelieviData(adesso) + soldi < this.limite){
+						//  questo avviene solo quando non ho superato il limite giornaliero
+						this.saldo -= soldi;
+						this.cronologia.push({
+						tipo : 'prelievo',
+						importo : soldi,
+						data : dataPrelievo.toISOString().split('T')[0]
+						});
+					} else{
+						console.log("hai superato il limite!");
+					}
+					return this.saldo;
+				}
+
+				calcolaPrelieviData(data) {
+					var somma = 0 ;
+
+					this.cronologia
+						.filter(record => record.tipo == 'prelievo')
+						.filter(record => record.data == data)
+						.forEach(record => somma += record.importo);
+					return somma;			
+				}
+
+				
+				
+			}
+
+			class ContoRisparmio extends Account{
+
+
+				constructor(titolare,saldo,tassoInteresse){
+					super(titolare,saldo)
+					this.tassoInteresse = tassoInteresse;
+					this.cronologia = [];
+				}
+
+				calcolaTassoInteresse(){
+					return this.saldo*this.tassoInteresse;
+				}
+
+				
+
+			}
+
+			p1 = new ContoCorrente("luigi", 1000, 200);
+
+			p2 = new ContoRisparmio("mario",2000,10);
+
+					/*	console.log(p2.calcolaTassoInteresse());
+
+						console.log(p1.getSaldo());
+
+						console.log("deposito 100 euro");
+
+						console.log(p1.deposito(100));   */
+
+			var ieri = new Date(2025, 2, 26);
+
+			var oggi = new Date(2025, 2, 27);
+
+
+			console.log(p1.deposito(500));
+
+			console.log(p1.prelievo(100, ieri));
+
+			console.log(p1.prelievo(100, oggi));
+			console.log(p1.prelievo(100, oggi));
+
+
+			console.log(p1.prelievo(100, oggi));
+
+			p1.stampaEstrattoConto();
+
+
+
+			
+
+
+		</script>
+	<title>
+	</title>
+</head>
+<body>
+
+</body>
+</html>
